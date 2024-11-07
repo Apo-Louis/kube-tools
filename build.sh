@@ -1,6 +1,6 @@
 docker build . -t apoolouis8/kube_tools:latest
 
-docker push apoolouis8/kube_tools:latest
+docker push apoolouis8/kube_tools:alpine-1.0.0
 # ❯ docker run -v ~/Downloads/config:/home/k8suser/.kube/config apoolouis8/kube_tools:latest helm list
 
 

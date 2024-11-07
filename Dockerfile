@@ -1,31 +1,29 @@
-FROM ubuntu:latest
+FROM alpine:latest
 
 LABEL maintainer="alimoviee@gmail.com"
 
-RUN apt-get update && apt-get install -y \
+# Mise à jour des paquets et installation des dépendances nécessaires
+RUN apk update && apk add --no-cache \
     curl \
-    apt-transport-https \
     gnupg \
     ca-certificates \
-    lsb-release && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+    lsb-release \
+    openssl \
+    bash && \
+    rm -rf /var/cache/apk/*
 
-RUN mkdir -p /etc/apt/keyrings
+# Installation de kubectl directement via téléchargement du binaire
+RUN curl -fsSL https://dl.k8s.io/release/v1.31.0/bin/linux/amd64/kubectl -o /usr/local/bin/kubectl && \
+    chmod +x /usr/local/bin/kubectl
 
-RUN curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.31/deb/Release.key | gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.31/deb/ /" | tee /etc/apt/sources.list.d/kubernetes.list && \
-    apt-get update && apt-get install -y kubectl && \
-    apt-get autoremove -y && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-
+# Installation de Helm
 RUN curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Nettoyage
+RUN rm -rf /var/cache/apk/*
 
+# Création du répertoire .kube
 RUN mkdir -p /root/.kube
 
-
 CMD while true; do bash; done
+
